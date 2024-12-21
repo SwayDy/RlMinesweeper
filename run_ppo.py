@@ -359,16 +359,16 @@ if __name__ == "__main__":
         # eval and save the model
         if global_step // args.eval_frequence > eval_index:
             if args.env_id == "Minesweeper-v1":
-                make_env = make_env(MinesweeperEnv_v1, grid_size=args.grid_size, num_mines=args.num_mines, is_train=False)
+                mkEnv = make_env(MinesweeperEnv_v1, grid_size=args.grid_size, num_mines=args.num_mines, is_train=False)
             elif args.env_id == "Minesweeper-v2":
-                make_env = make_env(MinesweeperEnv_v2, grid_size=args.grid_size, num_mines=args.num_mines, is_train=False)
+                mkEnv = make_env(MinesweeperEnv_v2, grid_size=args.grid_size, num_mines=args.num_mines, is_train=False)
             else:
                 raise NotImplementedError
 
             mr, wr = eval_model(
                 agent,
                 gym.vector.SyncVectorEnv(
-                    [make_env for _ in range(args.num_levels)]
+                    [mkEnv for _ in range(args.num_levels)]
                 ),
                 device=device
             )
