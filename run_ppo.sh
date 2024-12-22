@@ -3,6 +3,7 @@ nohup python run_ppo.py --exp_name run_ppo-mobilenet \
                         --num_mines 10 \
                         --train_num_mines_range "(8, 12)" \
                         --seed 123 \
+                        --env_id Minesweeper-v1 \
                         --model_id Agent_ppo_minesweeper \
                         --total_timesteps 300000000 \
                         --learning_rate 2.5e-4 \

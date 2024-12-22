@@ -51,9 +51,9 @@ def parse_args():
                         help='whether to capture videos of the agent performances (check out `videos` folder)')
 
     # Algorithm specific arguments
-    parser.add_argument('--env_id', type=str, default="Minesweeper-v2",
+    parser.add_argument('--env_id', type=str, default="Minesweeper-v1",
                         help='the id of the environment chose from v1, v2')
-    parser.add_argument('--model_id', type=str, default='Agent_ppo_minesweeper_mobilenet_v3_small',
+    parser.add_argument('--model_id', type=str, default='Agent_ppo_minesweeper',
                         help='the id of the model chose from general, mobilenet-small or large')
     parser.add_argument('--total_timesteps', type=int, default=10000000,
                         help='total timesteps of the experiments')
@@ -69,7 +69,7 @@ def parse_args():
                         help='the pretrained weight path of the agent')
     parser.add_argument('--freeze_weight', type=lambda x: str(x).lower() == 'true', default=False,
                         help='whether to freeze some weight of the agent')
-    parser.add_argument('--eval_frequence', type=int, default=500,
+    parser.add_argument('--eval_frequence', type=int, default=50000,
                         help='time steps to save the model')
     parser.add_argument('--log_frequence', type=int, default=50000,
                         help='time steps to log the training info')
@@ -361,13 +361,7 @@ if __name__ == "__main__":
 
         # eval and save the model
         if global_step // args.eval_frequence > eval_index:
-            if args.env_id == "Minesweeper-v1":
-                mkEnv = make_env(MinesweeperEnv_v1, grid_size=args.grid_size, num_mines=args.num_mines, is_train=False)
-            elif args.env_id == "Minesweeper-v2":
-                mkEnv = make_env(MinesweeperEnv_v2, grid_size=args.grid_size, num_mines=args.num_mines, is_train=False)
-            else:
-                raise NotImplementedError
-
+            mkEnv = make_env(MinesweeperEnv_v1, grid_size=args.grid_size, num_mines=args.num_mines, is_train=False)
             mr, wr = eval_model(
                 agent,
                 gym.vector.SyncVectorEnv(
