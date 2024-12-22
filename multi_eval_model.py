@@ -1,8 +1,15 @@
-import torch.multiprocessing as mp
-import gymnasium as gym
+import time
+
 import numpy as np
+import gymnasium as gym
 import torch
+import torch.multiprocessing as mp
+
 from tqdm import tqdm
+
+from utils import make_env
+from agent import Agent_ppo_minesweeper
+from minesweeper import MinesweeperEnv_v1
 
 
 def eval_model(
@@ -49,14 +56,8 @@ def eval_model(
     return total_reward, win_count, count
 
 def worker(rank, model_path, device, num_envs, num_episodes, result_queue):
-    from agent import Agent_ppo_minesweeper
-    from minesweeper import MinesweeperEnv_v1
-
-    def create_minesweeperenv_v1():
-        return MinesweeperEnv_v1(is_train=False)
-
     envs = gym.vector.SyncVectorEnv(
-        [create_minesweeperenv_v1 for _ in range(num_envs)]
+        [make_env(MinesweeperEnv_v1, is_train=False) for _ in range(num_envs)]
     )
 
     agent = Agent_ppo_minesweeper(envs).to(device)
@@ -95,14 +96,12 @@ def aggregate_results(result_queue, num_processes):
     return total_avg_return, total_win_rate
 
 if __name__ == "__main__":
-    import time
-
     mp.set_start_method("spawn")
 
     num_processes = 8
     model_path = "models/last.pt"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    num_envs = 128
+    num_envs = 8
     num_episodes = 8000 // num_processes  # Number of episodes per process
 
     result_queue = mp.Queue()

@@ -1,9 +1,20 @@
-import random
-from typing import Callable
+import json
 
 import gymnasium as gym
 import numpy as np
 import torch
+
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NpEncoder, self).default(obj)
 
 
 def eval_model(
@@ -77,7 +88,7 @@ if __name__ == "__main__":
     )
 
     agent = Agent_ppo_minesweeper(envs).to(device)
-    agent.load_state_dict(torch.load("checkpoint/last.pt"))
+    agent.load_state_dict(torch.load("models/last.pt"))
 
     start_time = time.time()
     eval_model(agent, envs, device=device, is_ellipsis=False)

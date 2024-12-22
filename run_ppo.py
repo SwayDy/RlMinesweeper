@@ -51,10 +51,10 @@ def parse_args():
                         help='whether to capture videos of the agent performances (check out `videos` folder)')
 
     # Algorithm specific arguments
-    parser.add_argument('--env_id', type=str, default="Minesweeper-v1",
-                        help='the id of the environment')
-    parser.add_argument('--model_id', type=str, default='Agent_ppo_minesweeper',
-                        help='the id of the model')
+    parser.add_argument('--env_id', type=str, default="Minesweeper-v2",
+                        help='the id of the environment chose from v1, v2')
+    parser.add_argument('--model_id', type=str, default='Agent_ppo_minesweeper_mobilenet_v3_small',
+                        help='the id of the model chose from general, mobilenet-small or large')
     parser.add_argument('--total_timesteps', type=int, default=10000000,
                         help='total timesteps of the experiments')
     parser.add_argument('--learning_rate', type=float, default=2.5e-4,
@@ -66,11 +66,13 @@ def parse_args():
     parser.add_argument('--num_steps', type=int, default=128,
                         help='the number of steps to run in each environment per policy rollout')
     parser.add_argument('--pretrained', type=str,
-                        help='the pretrained weight agent load')
+                        help='the pretrained weight path of the agent')
     parser.add_argument('--freeze_weight', type=lambda x: str(x).lower() == 'true', default=False,
                         help='whether to freeze some weight of the agent')
-    parser.add_argument('--eval_frequence', type=int, default=50000,
+    parser.add_argument('--eval_frequence', type=int, default=500,
                         help='time steps to save the model')
+    parser.add_argument('--log_frequence', type=int, default=50000,
+                        help='time steps to log the training info')
     parser.add_argument('--anneal_lr', type=lambda x: str(x).lower() == 'true', default=True,
                         help='Toggle learning rate annealing for policy and value networks')
     parser.add_argument('--gamma', type=float, default=0.99,
@@ -116,7 +118,8 @@ if __name__ == "__main__":
     args.batch_size = int(args.num_envs * args.num_steps)
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
-    run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
+    run_name = (f"{args.model_id}__{args.env_id}__{args.exp_name}__{args.seed}__"
+                f"{time.asctime().replace(' ', '-').replace(':', '-')}")
     if args.track:
         import wandb
 
@@ -253,7 +256,7 @@ if __name__ == "__main__":
             next_obs, next_done = torch.Tensor(np.array(next_obs)).to(device), torch.Tensor(np.array(next_done)).to(
                 device)
 
-            if "final_info" in infos and global_step // args.eval_frequence > tb_index:  # 减少log采样频率
+            if "final_info" in infos and global_step // args.log_frequence > tb_index:  # 减少log采样频率
                 for info in infos["final_info"]:
                     if info and "episode" in info:
                         # print(f"global_step={global_step}, episodic_return={info['episode']['r']}")

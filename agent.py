@@ -50,17 +50,12 @@ class Agent_ppo_minesweeper(nn.Module):
         hidden = self.network(x)
         logits = self.actor(hidden)
 
-        # logits_mu = torch.mean(logits, dim=1, keepdim=True)
-        # logits_std = torch.std(logits, dim=1, keepdim=True)
-        # bias = torch.flatten(x[:, 1], 1)
-        # bias_mu = torch.mean(bias, dim=1, keepdim=True)
-        # bias_std = torch.std(bias, dim=1, keepdim=True)
-        # logits = logits - (logits_std * (bias - bias_mu) / (bias_std + 1e-7) + logits_mu)
-
-        logits = logits - (torch.std(logits, dim=1, keepdim=True) * (
-                    torch.flatten(x[:, 1], 1) - torch.mean(torch.flatten(x[:, 1], 1), dim=1, keepdim=True)) / (
-                                       torch.std(torch.flatten(x[:, 1], 1), dim=1, keepdim=True) + 1e-7) + torch.mean(
-            logits, dim=1, keepdim=True))
+        logits_mu = torch.mean(logits, dim=1, keepdim=True)
+        logits_std = torch.std(logits, dim=1, keepdim=True)
+        bias = torch.flatten(x[:, 1], 1)
+        bias_mu = torch.mean(bias, dim=1, keepdim=True)
+        bias_std = torch.std(bias, dim=1, keepdim=True)
+        logits = logits - (logits_std * (bias - bias_mu) / (bias_std + 1e-7) + logits_mu)
 
         probs = Categorical(logits=logits)
         if action is None:
@@ -80,11 +75,6 @@ class ConditionalBatchNorm2d(nn.BatchNorm2d):
 
 # 替换网络中的 BatchNorm2d 层
 def replace_bn_with_conditional(model):
-    """
-    卧槽这个太牛逼了！！！
-    :param model: nn.Module
-    :return: None
-    """
     for name, module in model.named_children():
         if isinstance(module, nn.BatchNorm2d):
             setattr(model, name, ConditionalBatchNorm2d(module.num_features, module.eps, module.momentum, module.affine,
