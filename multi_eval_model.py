@@ -99,7 +99,7 @@ if __name__ == "__main__":
     mp.set_start_method("spawn")
 
     num_processes = 8
-    model_path = "models/agent_7.9796_0.5978.pt"
+    model_path = "models/agent_9.2711_0.7148.pt"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     num_envs = 128
     num_episodes = 8000 // num_processes  # Number of episodes per process

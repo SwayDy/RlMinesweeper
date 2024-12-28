@@ -101,10 +101,12 @@ class Agent_ppo_minesweeper_mobilenet_v3_large(nn.Module):
             _mobilenet_v3_large.features,
             _mobilenet_v3_large.avgpool,
             nn.Flatten(),
+            layer_init(nn.Linear(960, 512)),
+            nn.ReLU()
         )
 
-        self.actor = layer_init(nn.Linear(960, envs.single_action_space.n), std=0.01)
-        self.critic = layer_init(nn.Linear(960, 1), std=1)
+        self.actor = layer_init(nn.Linear(512, envs.single_action_space.n), std=0.01)
+        self.critic = layer_init(nn.Linear(512, 1), std=1)
 
     def get_value(self, x):
         return self.critic(self.network(x))
@@ -148,10 +150,12 @@ class Agent_ppo_minesweeper_mobilenet_v3_small(nn.Module):
             _mobilenet_v3_small.features,
             _mobilenet_v3_small.avgpool,
             nn.Flatten(),
+            layer_init(nn.Linear(576, 512)),
+            nn.ReLU()
         )
 
-        self.actor = layer_init(nn.Linear(576, envs.single_action_space.n), std=0.01)
-        self.critic = layer_init(nn.Linear(576, 1), std=1)
+        self.actor = layer_init(nn.Linear(512, envs.single_action_space.n), std=0.01)
+        self.critic = layer_init(nn.Linear(512, 1), std=1)
 
     def get_value(self, x):
         return self.critic(self.network(x))

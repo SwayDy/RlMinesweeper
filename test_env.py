@@ -13,6 +13,8 @@ from minesweeper import MinesweeperEnv
 
 
 def human_click(env, is_repeat=True):
+    if not env.is_render:
+        raise ValueError("env.is_render must be True.")
     # human click
     state, _ = env.reset()
     env.render()
@@ -50,6 +52,9 @@ def agent_click(env, agent, is_repeat=True):
     # agent click
     is_render = env.is_render
 
+    if not is_render:
+        print("Warning!:env.is_render is False so that video system not initialized.")
+
     total_reward = 0
     win_count = 0
     len_count = 0
@@ -81,13 +86,12 @@ def agent_click(env, agent, is_repeat=True):
             # print(f"action: {action}, reward: {reward}")
 
             state = next_state
-
-            # for event in pygame.event.get():
-            #     if event.type == pygame.QUIT:
-            #         pygame.quit()
-            #         done = True
-            #         is_repeat = False
-
+            if is_render:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        done = True
+                        is_repeat = False
             if done and is_repeat:
                 # print(f"epoch: {t}, return: {info.get('episode').get('r')}, result: {info.get('game_state')}")
 
@@ -122,12 +126,12 @@ if __name__ == "__main__":
     # is_repeat = True
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    env = MinesweeperEnv(is_render=True, is_train=False)
+    env = MinesweeperEnv(is_render=False, is_train=False)
 
     agent = Agent_ppo_minesweeper(
         gym.vector.SyncVectorEnv([lambda: MinesweeperEnv() for i in range(1)])
     ).to(device)
-    agent.load_state_dict(torch.load("models/last.pt"))
+    agent.load_state_dict(torch.load("models/agent_9.2711_0.7148.pt"))
 
-    human_click(env)
-    # agent_click(env, agent)
+    # human_click(env)
+    agent_click(env, agent)

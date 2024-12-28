@@ -88,7 +88,7 @@ if __name__ == "__main__":
     )
 
     agent = Agent_ppo_minesweeper(envs).to(device)
-    agent.load_state_dict(torch.load("models/last.pt"))
+    agent.load_state_dict(torch.load("models/agent_9.2711_0.7148.pt"))
 
     start_time = time.time()
     eval_model(agent, envs, device=device, is_ellipsis=False)

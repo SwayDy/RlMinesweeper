@@ -1,7 +1,7 @@
-nohup python run_ppo.py --exp_name run_ppo-mobilenet \
+nohup python run_ppo.py --exp_name run_ppo \
                         --grid_size "(9, 9)" \
                         --num_mines 10 \
-                        --train_num_mines_range "(8, 12)" \
+                        --train_num_mines_range "(10, 10)" \
                         --seed 123 \
                         --env_id Minesweeper-v1 \
                         --model_id Agent_ppo_minesweeper \
@@ -17,4 +17,4 @@ nohup python run_ppo.py --exp_name run_ppo-mobilenet \
                         --num_minibatches 4 \
                         --update_epochs 32 \
                         --start_iter 1 \
-    >> run_log-mobilenet.log &
+    >> run_log.log &
